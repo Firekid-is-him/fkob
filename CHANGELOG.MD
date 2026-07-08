@@ -4,7 +4,7 @@ All notable changes to this project are documented here.
 
 Format follows Keep a Changelog. This project uses semantic versioning: major.minor.patch.
 
-## [1.0.0]
+## [0.1.0]
 
 Initial release.
 
