@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fkobf</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #ffffff;
+  color: #000000;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+nav {
+  display: flex;
+  gap: 8px;
+}
+
+nav button {
+  background: #ffffff;
+  border: 1px solid #000000;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #000000;
+}
+
+nav button.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+section {
+  display: none;
+}
+
+section.active {
+  display: block;
+}
+
+.dropzone {
+  border: 2px dashed #000000;
+  border-radius: 4px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.dropzone.dragover {
+  background: #f2f2f2;
+}
+
+.dropzone p {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.dropzone .hint {
+  font-size: 13px;
+  color: #555555;
+}
+
+.picker-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.picker-row button {
+  border: 1px solid #000000;
+  background: #ffffff;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.file-list {
+  border: 1px solid #000000;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.file-list.empty {
+  display: none;
+}
+
+.file-list div {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid #dddddd;
+  font-family: ui-monospace, monospace;
+}
+
+.file-list div:last-child {
+  border-bottom: none;
+}
+
+.options {
+  border: 1px solid #000000;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.options h3 {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.option-row:last-child {
+  margin-bottom: 0;
+}
+
+.option-row label {
+  font-size: 14px;
+  flex: 1;
+}
+
+.option-row input[type="text"],
+.option-row input[type="password"] {
+  border: 1px solid #000000;
+  padding: 6px 8px;
+  font-size: 14px;
+  width: 100%;
+  font-family: ui-monospace, monospace;
+}
+
+.preset-select {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-select button {
+  flex: 1;
+  border: 1px solid #000000;
+  background: #ffffff;
+  padding: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.preset-select button.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.action-button {
+  width: 100%;
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.action-button:disabled {
+  background: #999999;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 16px;
+  font-size: 14px;
+  padding: 12px;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  display: none;
+}
+
+.status.visible {
+  display: block;
+}
+
+.status.error {
+  border-color: #000000;
+  background: #f2f2f2;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10;
+}
+
+.modal-overlay.visible {
+  display: flex;
+}
+
+.modal {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 480px;
+  width: 100%;
+}
+
+.modal h2 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.modal p {
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.key-box {
+  border: 1px solid #000000;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  word-break: break-all;
+  margin-bottom: 16px;
+  background: #f9f9f9;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.modal-buttons .copy-button {
+  background: #ffffff;
+  border: 1px solid #000000;
+  color: #000000;
+}
+
+.modal-buttons .confirm-button {
+  background: #000000;
+  border: 1px solid #000000;
+  color: #ffffff;
+}
+
+.modal-buttons .confirm-button:disabled {
+  background: #999999;
+  cursor: not-allowed;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.warning-text {
+  font-size: 13px;
+  color: #000000;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  background: #f9f9f9;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>fkobf</h1>
+    <nav>
+      <button id="nav-encrypt" class="active" onclick="switchTab('encrypt')">Encrypt</button>
+      <button id="nav-decrypt" onclick="switchTab('decrypt')">Decrypt</button>
+      <button id="nav-obfuscate" onclick="switchTab('obfuscate')">Obfuscate</button>
+    </nav>
+  </header>
+
+  <section id="section-encrypt" class="active">
+    <div class="dropzone" id="dropzone-encrypt">
+      <p>Drop files, a folder, or a zip here</p>
+      <p class="hint">or use the buttons below</p>
+      <div class="picker-row">
+        <button onclick="document.getElementById('file-input-encrypt').click()">Choose files</button>
+        <button onclick="document.getElementById('folder-input-encrypt').click()">Choose folder</button>
+      </div>
+    </div>
+    <input type="file" id="file-input-encrypt" multiple>
+    <input type="file" id="folder-input-encrypt" webkitdirectory>
+
+    <div class="file-list empty" id="file-list-encrypt"></div>
+
+    <div class="options">
+      <h3>Unlock method</h3>
+      <div class="option-row">
+        <input type="checkbox" id="opt-key" checked>
+        <label for="opt-key">Auto-generated key</label>
+      </div>
+      <div class="option-row">
+        <input type="checkbox" id="opt-password">
+        <label for="opt-password">Password</label>
+      </div>
+      <div class="option-row" id="password-row" style="display: none;">
+        <input type="password" id="opt-password-value" placeholder="Enter a password">
+      </div>
+      <div class="option-row" id="hide-names-row" style="display: none;">
+        <input type="checkbox" id="opt-hide-names">
+        <label for="opt-hide-names">Hide filenames inside the zip</label>
+      </div>
+    </div>
+
+    <button class="action-button" id="encrypt-button" onclick="runEncrypt()">Encrypt</button>
+    <div class="status" id="status-encrypt"></div>
+  </section>
+
+  <section id="section-decrypt">
+    <div class="dropzone" id="dropzone-decrypt">
+      <p>Drop encrypted files or a folder here</p>
+      <p class="hint">or use the buttons below</p>
+      <div class="picker-row">
+        <button onclick="document.getElementById('file-input-decrypt').click()">Choose files</button>
+        <button onclick="document.getElementById('folder-input-decrypt').click()">Choose folder</button>
+      </div>
+    </div>
+    <input type="file" id="file-input-decrypt" multiple>
+    <input type="file" id="folder-input-decrypt" webkitdirectory>
+
+    <div class="file-list empty" id="file-list-decrypt"></div>
+
+    <div class="options">
+      <h3>Unlock with</h3>
+      <div class="option-row">
+        <label for="opt-decrypt-key">Key</label>
+        <input type="text" id="opt-decrypt-key" placeholder="64 character key">
+      </div>
+      <div class="option-row">
+        <label for="opt-decrypt-password">Password</label>
+        <input type="password" id="opt-decrypt-password" placeholder="Password">
+      </div>
+    </div>
+
+    <button class="action-button" id="decrypt-button" onclick="runDecrypt()">Decrypt</button>
+    <div class="status" id="status-decrypt"></div>
+  </section>
+
+  <section id="section-obfuscate">
+    <div class="dropzone" id="dropzone-obfuscate">
+      <p>Drop JavaScript files or a folder here</p>
+      <p class="hint">output still runs directly, no key needed</p>
+      <div class="picker-row">
+        <button onclick="document.getElementById('file-input-obfuscate').click()">Choose files</button>
+        <button onclick="document.getElementById('folder-input-obfuscate').click()">Choose folder</button>
+      </div>
+    </div>
+    <input type="file" id="file-input-obfuscate" multiple accept=".js">
+    <input type="file" id="folder-input-obfuscate" webkitdirectory>
+
+    <div class="file-list empty" id="file-list-obfuscate"></div>
+
+    <div class="options">
+      <h3>Preset</h3>
+      <div class="preset-select">
+        <button class="preset-btn active" data-preset="light" onclick="selectPreset('light')">Light</button>
+        <button class="preset-btn" data-preset="medium" onclick="selectPreset('medium')">Medium</button>
+        <button class="preset-btn" data-preset="heavy" onclick="selectPreset('heavy')">Heavy</button>
+      </div>
+    </div>
+
+    <button class="action-button" id="obfuscate-button" onclick="runObfuscate()">Obfuscate</button>
+    <div class="status" id="status-obfuscate"></div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="key-modal">
+  <div class="modal">
+    <h2>Save this key</h2>
+    <p>This key is the only way to recover your data if you did not also set a password. It will not be shown again.</p>
+    <div class="key-box" id="key-box-content"></div>
+    <div class="warning-text">A file containing this key will also download automatically.</div>
+    <div class="modal-buttons">
+      <button class="copy-button" onclick="copyKey()">Copy key</button>
+      <button class="confirm-button" id="confirm-key-button" onclick="closeKeyModal()" disabled>I have saved it, continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedFiles = { encrypt: [], decrypt: [], obfuscate: [] }
+let selectedPreset = 'light'
+let pendingKeyText = ''
+
+function switchTab(tab) {
+  document.querySelectorAll('nav button').forEach(function (btn) { btn.classList.remove('active') })
+  document.querySelectorAll('section').forEach(function (sec) { sec.classList.remove('active') })
+  document.getElementById('nav-' + tab).classList.add('active')
+  document.getElementById('section-' + tab).classList.add('active')
+}
+
+function selectPreset(preset) {
+  selectedPreset = preset
+  document.querySelectorAll('.preset-btn').forEach(function (btn) {
+    btn.classList.toggle('active', btn.dataset.preset === preset)
+  })
+}
+
+function renderFileList(mode) {
+  const list = document.getElementById('file-list-' + mode)
+  const files = selectedFiles[mode]
+  list.classList.toggle('empty', files.length === 0)
+  list.innerHTML = ''
+  files.forEach(function (entry) {
+    const div = document.createElement('div')
+    div.textContent = entry.relativePath
+    list.appendChild(div)
+  })
+}
+
+function filesFromFileList(fileList) {
+  const result = []
+  for (let i = 0; i < fileList.length; i++) {
+    const file = fileList[i]
+    const relativePath = file.webkitRelativePath || file.name
+    result.push({ file: file, relativePath: relativePath })
+  }
+  return result
+}
+
+function setupDropzone(mode) {
+  const zone = document.getElementById('dropzone-' + mode)
+  zone.addEventListener('dragover', function (e) {
+    e.preventDefault()
+    zone.classList.add('dragover')
+  })
+  zone.addEventListener('dragleave', function () {
+    zone.classList.remove('dragover')
+  })
+  zone.addEventListener('drop', function (e) {
+    e.preventDefault()
+    zone.classList.remove('dragover')
+    const entries = filesFromFileList(e.dataTransfer.files)
+    selectedFiles[mode] = entries
+    renderFileList(mode)
+  })
+
+  document.getElementById('file-input-' + mode).addEventListener('change', function (e) {
+    selectedFiles[mode] = filesFromFileList(e.target.files)
+    renderFileList(mode)
+  })
+
+  document.getElementById('folder-input-' + mode).addEventListener('change', function (e) {
+    selectedFiles[mode] = filesFromFileList(e.target.files)
+    renderFileList(mode)
+  })
+}
+
+setupDropzone('encrypt')
+setupDropzone('decrypt')
+setupDropzone('obfuscate')
+
+document.getElementById('opt-password').addEventListener('change', function (e) {
+  document.getElementById('password-row').style.display = e.target.checked ? 'flex' : 'none'
+})
+
+function updateHideNamesVisibility() {
+  const files = selectedFiles.encrypt
+  const isSingleZip = files.length === 1 && files[0].relativePath.toLowerCase().endsWith('.zip')
+  document.getElementById('hide-names-row').style.display = isSingleZip ? 'flex' : 'none'
+}
+
+const originalRenderFileList = renderFileList
+renderFileList = function (mode) {
+  originalRenderFileList(mode)
+  if (mode === 'encrypt') updateHideNamesVisibility()
+}
+
+function showStatus(mode, message, isError) {
+  const el = document.getElementById('status-' + mode)
+  el.textContent = message
+  el.className = 'status visible' + (isError ? ' error' : '')
+}
+
+function downloadBase64File(name, base64Data) {
+  const link = document.createElement('a')
+  link.href = 'data:application/octet-stream;base64,' + base64Data
+  link.download = name
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+function downloadTextFile(name, text) {
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = name
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+function showKeyModal(keyText, suggestedFileName) {
+  pendingKeyText = keyText
+  document.getElementById('key-box-content').textContent = keyText
+  document.getElementById('confirm-key-button').disabled = true
+  document.getElementById('key-modal').classList.add('visible')
+  downloadTextFile(suggestedFileName + '.key', keyText)
+}
+
+function copyKey() {
+  navigator.clipboard.writeText(pendingKeyText).then(function () {
+    document.getElementById('confirm-key-button').disabled = false
+  })
+}
+
+function closeKeyModal() {
+  document.getElementById('key-modal').classList.remove('visible')
+}
+
+async function runEncrypt() {
+  const files = selectedFiles.encrypt
+  if (files.length === 0) {
+    showStatus('encrypt', 'Choose at least one file or folder first', true)
+    return
+  }
+
+  const wantsKey = document.getElementById('opt-key').checked
+  const wantsPassword = document.getElementById('opt-password').checked
+
+  if (!wantsKey && !wantsPassword) {
+    showStatus('encrypt', 'Select at least one unlock method', true)
+    return
+  }
+
+  const password = document.getElementById('opt-password-value').value
+  if (wantsPassword && !password) {
+    showStatus('encrypt', 'Enter a password or uncheck password mode', true)
+    return
+  }
+
+  const hideNames = document.getElementById('opt-hide-names').checked
+  const mode = wantsKey && wantsPassword ? 'both' : (wantsKey ? 'key' : 'password')
+
+  const formData = new FormData()
+  formData.append('mode', mode)
+  if (wantsPassword) formData.append('password', password)
+  formData.append('hideNames', String(hideNames))
+
+  const relativePaths = files.map(function (entry) { return entry.relativePath })
+  formData.append('relativePaths', JSON.stringify(relativePaths))
+  files.forEach(function (entry) {
+    formData.append('files', entry.file, entry.relativePath)
+  })
+
+  document.getElementById('encrypt-button').disabled = true
+  showStatus('encrypt', 'Encrypting', false)
+
+  try {
+    const response = await fetch('/api/encrypt', { method: 'POST', body: formData })
+    const data = await response.json()
+
+    if (!response.ok) {
+      showStatus('encrypt', data.error || 'Encryption failed', true)
+      return
+    }
+
+    data.files.forEach(function (f) {
+      downloadBase64File(f.name, f.data)
+    })
+
+    showStatus('encrypt', 'Encrypted ' + data.files.length + ' file(s)', false)
+
+    if (data.key) {
+      showKeyModal(data.key, files[0].relativePath.split('/')[0] || 'fkobf')
+    }
+  } catch (error) {
+    showStatus('encrypt', error.message, true)
+  } finally {
+    document.getElementById('encrypt-button').disabled = false
+  }
+}
+
+async function runDecrypt() {
+  const files = selectedFiles.decrypt
+  if (files.length === 0) {
+    showStatus('decrypt', 'Choose at least one file or folder first', true)
+    return
+  }
+
+  const key = document.getElementById('opt-decrypt-key').value.trim()
+  const password = document.getElementById('opt-decrypt-password').value
+
+  if (!key && !password) {
+    showStatus('decrypt', 'Enter the key or the password', true)
+    return
+  }
+
+  const formData = new FormData()
+  if (key) formData.append('key', key)
+  if (password) formData.append('password', password)
+
+  const relativePaths = files.map(function (entry) { return entry.relativePath })
+  formData.append('relativePaths', JSON.stringify(relativePaths))
+  files.forEach(function (entry) {
+    formData.append('files', entry.file, entry.relativePath)
+  })
+
+  document.getElementById('decrypt-button').disabled = true
+  showStatus('decrypt', 'Decrypting', false)
+
+  try {
+    const response = await fetch('/api/decrypt', { method: 'POST', body: formData })
+    const data = await response.json()
+
+    if (!response.ok) {
+      showStatus('decrypt', data.error || 'Decryption failed', true)
+      return
+    }
+
+    data.files.forEach(function (f) {
+      downloadBase64File(f.name, f.data)
+    })
+
+    showStatus('decrypt', 'Decrypted ' + data.files.length + ' file(s)', false)
+  } catch (error) {
+    showStatus('decrypt', error.message, true)
+  } finally {
+    document.getElementById('decrypt-button').disabled = false
+  }
+}
+
+async function runObfuscate() {
+  const files = selectedFiles.obfuscate
+  if (files.length === 0) {
+    showStatus('obfuscate', 'Choose at least one JavaScript file first', true)
+    return
+  }
+
+  const formData = new FormData()
+  formData.append('preset', selectedPreset)
+
+  const relativePaths = files.map(function (entry) { return entry.relativePath })
+  formData.append('relativePaths', JSON.stringify(relativePaths))
+  files.forEach(function (entry) {
+    formData.append('files', entry.file, entry.relativePath)
+  })
+
+  document.getElementById('obfuscate-button').disabled = true
+  showStatus('obfuscate', 'Obfuscating', false)
+
+  try {
+    const response = await fetch('/api/obfuscate', { method: 'POST', body: formData })
+    const data = await response.json()
+
+    if (!response.ok) {
+      showStatus('obfuscate', data.error || 'Obfuscation failed', true)
+      return
+    }
+
+    data.files.forEach(function (f) {
+      downloadBase64File(f.name, f.data)
+    })
+
+    showStatus('obfuscate', 'Obfuscated ' + data.files.length + ' file(s)', false)
+  } catch (error) {
+    showStatus('obfuscate', error.message, true)
+  } finally {
+    document.getElementById('obfuscate-button').disabled = false
+  }
+}
+</script>
+</body>
+</html>

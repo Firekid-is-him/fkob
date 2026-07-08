@@ -1,0 +1,42 @@
+{
+  "name": "fkobf",
+  "version": "1.0.0",
+  "description": "Self-hosted local file encryption and code obfuscation tool",
+  "main": "src/index.js",
+  "bin": {
+    "fkobf": "./bin/cli.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "start": "node gui/server.js",
+    "cli": "node bin/cli.js",
+    "test": "node --test"
+  },
+  "files": [
+    "src",
+    "bin",
+    "gui",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "encryption",
+    "obfuscation",
+    "aes-256-gcm",
+    "argon2",
+    "self-hosted",
+    "cli"
+  ],
+  "author": "Firekid",
+  "license": "GPL-3.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "hash-wasm": "^4.12.0",
+    "adm-zip": "^0.5.10",
+    "javascript-obfuscator": "^4.1.1",
+    "commander": "^12.0.0",
+    "prompts": "^2.4.2"
+  }
+}
