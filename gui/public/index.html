@@ -4,146 +4,344 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>fkobf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-raised: #1c1c1c;
+  --border: #2a2a2a;
+  --border-bright: #3d3d3d;
+  --text: #fafaf8;
+  --text-dim: #8a8a86;
+  --text-faint: #55534f;
+  --white: #ffffff;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: #ffffff;
-  color: #000000;
-  min-height: 100vh;
+html {
+  scroll-behavior: smooth;
 }
 
-.container {
-  max-width: 720px;
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.noise-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 0;
+  image-rendering: pixelated;
+}
+
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 24px 16px 80px;
+  padding: 40px 20px 100px;
 }
 
 header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #000000;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
+  align-items: flex-end;
+  padding-bottom: 24px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
 }
 
-header h1 {
-  font-size: 20px;
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.brand h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
+.brand .tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+  padding-left: 18px;
+}
+
+.status-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 5px 12px;
+  letter-spacing: 0.02em;
+}
+
 nav {
   display: flex;
-  gap: 8px;
+  gap: 2px;
+  margin: 28px 0 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
 }
 
 nav button {
-  background: #ffffff;
-  border: 1px solid #000000;
-  padding: 8px 16px;
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 16px;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  color: #000000;
+  color: var(--text-dim);
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 nav button.active {
-  background: #000000;
-  color: #ffffff;
+  background: var(--white);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+nav button:not(.active):hover {
+  color: var(--text);
 }
 
 section {
   display: none;
+  animation: fade-in 0.35s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 section.active {
   display: block;
 }
 
-.dropzone {
-  border: 2px dashed #000000;
-  border-radius: 4px;
-  padding: 48px 24px;
-  text-align: center;
-  cursor: pointer;
-  margin-bottom: 24px;
+.mode-intro {
+  margin-bottom: 20px;
 }
 
-.dropzone.dragover {
-  background: #f2f2f2;
-}
-
-.dropzone p {
-  font-size: 15px;
+.mode-intro h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
   margin-bottom: 4px;
 }
 
-.dropzone .hint {
+.mode-intro p {
   font-size: 13px;
-  color: #555555;
+  color: var(--text-dim);
+  line-height: 1.5;
+  max-width: 52ch;
+}
+
+.dropzone {
+  border: 1px dashed var(--border-bright);
+  border-radius: 14px;
+  padding: 52px 24px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+  background: var(--surface);
+  transition: border-color 0.2s ease, background 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropzone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.04), transparent 70%);
+  pointer-events: none;
+}
+
+.dropzone.dragover {
+  background: var(--surface-raised);
+  border-color: var(--white);
+}
+
+.dropzone-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 16px;
+  border: 1px solid var(--border-bright);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzone-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--text-dim);
+}
+
+.dropzone p {
+  font-size: 14px;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.dropzone .hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-faint);
 }
 
 .picker-row {
   display: flex;
   gap: 8px;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 20px;
+  position: relative;
 }
 
 .picker-row button {
-  border: 1px solid #000000;
-  background: #ffffff;
-  padding: 8px 16px;
-  font-size: 13px;
+  border: 1px solid var(--border-bright);
+  background: var(--surface-raised);
+  color: var(--text);
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
   cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.1s ease;
+}
+
+.picker-row button:hover {
+  border-color: var(--white);
+}
+
+.picker-row button:active {
+  transform: scale(0.97);
 }
 
 .file-list {
-  border: 1px solid #000000;
-  border-radius: 4px;
-  margin-bottom: 24px;
-  max-height: 200px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  max-height: 220px;
   overflow-y: auto;
+  background: var(--surface);
 }
 
 .file-list.empty {
   display: none;
 }
 
-.file-list div {
-  padding: 8px 12px;
-  font-size: 13px;
-  border-bottom: 1px solid #dddddd;
-  font-family: ui-monospace, monospace;
+.file-list-item {
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.file-list div:last-child {
+.file-list-item::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.file-list-item:last-child {
   border-bottom: none;
 }
 
 .options {
-  border: 1px solid #000000;
-  border-radius: 4px;
-  padding: 16px;
-  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+  background: var(--surface);
 }
 
 .options h3 {
-  font-size: 14px;
-  margin-bottom: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .option-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .option-row:last-child {
@@ -153,15 +351,83 @@ section.active {
 .option-row label {
   font-size: 14px;
   flex: 1;
+  cursor: pointer;
+}
+
+.checkbox-wrap {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.checkbox-wrap input[type="checkbox"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  z-index: 2;
+}
+
+.checkbox-visual {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--border-bright);
+  border-radius: 5px;
+  background: var(--surface-raised);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-wrap input[type="checkbox"]:checked ~ .checkbox-visual {
+  background: var(--white);
+  border-color: var(--white);
+}
+
+.checkbox-visual svg {
+  width: 11px;
+  height: 11px;
+  stroke: var(--bg);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.checkbox-wrap input[type="checkbox"]:checked ~ .checkbox-visual svg {
+  opacity: 1;
 }
 
 .option-row input[type="text"],
 .option-row input[type="password"] {
-  border: 1px solid #000000;
-  padding: 6px 8px;
-  font-size: 14px;
+  border: 1px solid var(--border-bright);
+  background: var(--bg);
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 13px;
   width: 100%;
-  font-family: ui-monospace, monospace;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  transition: border-color 0.2s ease;
+}
+
+.option-row input[type="text"]:focus,
+.option-row input[type="password"]:focus {
+  outline: none;
+  border-color: var(--white);
+}
+
+.option-row input::placeholder {
+  color: var(--text-faint);
+}
+
+.field-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  width: 68px;
+  flex-shrink: 0;
 }
 
 .preset-select {
@@ -171,97 +437,166 @@ section.active {
 
 .preset-select button {
   flex: 1;
-  border: 1px solid #000000;
-  background: #ffffff;
-  padding: 8px;
+  border: 1px solid var(--border-bright);
+  background: var(--surface-raised);
+  color: var(--text-dim);
+  padding: 12px 8px;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .preset-select button.active {
-  background: #000000;
-  color: #ffffff;
+  background: var(--white);
+  color: var(--bg);
+  border-color: var(--white);
+  font-weight: 600;
+}
+
+.preset-detail {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin-top: 10px;
+  line-height: 1.5;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .action-button {
   width: 100%;
-  background: #000000;
-  color: #ffffff;
+  background: var(--white);
+  color: var(--bg);
   border: none;
-  padding: 14px;
-  font-size: 15px;
+  padding: 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 10px;
+  letter-spacing: 0.01em;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.action-button:hover:not(:disabled) {
+  box-shadow: 0 0 0 1px var(--white), 0 8px 24px rgba(255, 255, 255, 0.08);
+}
+
+.action-button:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .action-button:disabled {
-  background: #999999;
+  background: var(--border-bright);
+  color: var(--text-faint);
   cursor: not-allowed;
 }
 
 .status {
   margin-top: 16px;
-  font-size: 14px;
-  padding: 12px;
-  border: 1px solid #000000;
-  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
   display: none;
+  color: var(--text-dim);
+  background: var(--surface);
 }
 
 .status.visible {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status.visible::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--white);
+  flex-shrink: 0;
+  animation: pulse-dot 1.4s ease-in-out infinite;
 }
 
 .status.error {
-  border-color: #000000;
-  background: #f2f2f2;
+  border-color: var(--border-bright);
+  color: var(--text);
+}
+
+.status.error::before {
+  animation: none;
+  background: var(--text);
 }
 
 .modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 20px;
   z-index: 10;
 }
 
 .modal-overlay.visible {
   display: flex;
+  animation: fade-in 0.2s ease;
 }
 
 .modal {
-  background: #ffffff;
-  border: 1px solid #000000;
-  border-radius: 4px;
-  padding: 24px;
-  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 460px;
   width: 100%;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.modal-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--white);
+  padding: 4px 9px;
+  border-radius: 100px;
+  margin-bottom: 14px;
 }
 
 .modal h2 {
-  font-size: 16px;
-  margin-bottom: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .modal p {
-  font-size: 14px;
-  margin-bottom: 16px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  margin-bottom: 18px;
+  line-height: 1.55;
+  color: var(--text-dim);
 }
 
 .key-box {
-  border: 1px solid #000000;
-  border-radius: 4px;
-  padding: 12px;
-  font-family: ui-monospace, monospace;
+  border: 1px solid var(--border-bright);
+  border-radius: 10px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   word-break: break-all;
-  margin-bottom: 16px;
-  background: #f9f9f9;
+  margin-bottom: 14px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
 }
 
 .modal-buttons {
@@ -271,26 +606,35 @@ section.active {
 
 .modal-buttons button {
   flex: 1;
-  padding: 10px;
-  font-size: 14px;
+  padding: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 9px;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.15s ease;
 }
 
 .modal-buttons .copy-button {
-  background: #ffffff;
-  border: 1px solid #000000;
-  color: #000000;
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text);
+}
+
+.modal-buttons .copy-button:hover {
+  border-color: var(--white);
 }
 
 .modal-buttons .confirm-button {
-  background: #000000;
-  border: 1px solid #000000;
-  color: #ffffff;
+  background: var(--white);
+  border: 1px solid var(--white);
+  color: var(--bg);
 }
 
 .modal-buttons .confirm-button:disabled {
-  background: #999999;
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--text-faint);
   cursor: not-allowed;
 }
 
@@ -299,34 +643,77 @@ input[type="file"] {
 }
 
 .warning-text {
-  font-size: 13px;
-  color: #000000;
-  margin-top: 8px;
-  padding: 8px 12px;
-  border: 1px solid #000000;
-  border-radius: 4px;
-  background: #f9f9f9;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-bottom: 18px;
+  padding-left: 2px;
+  line-height: 1.5;
+}
+
+footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+
+@media (max-width: 480px) {
+  .shell {
+    padding: 24px 16px 80px;
+  }
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .dropzone {
+    padding: 36px 16px;
+  }
 }
 </style>
 </head>
 <body>
-<div class="container">
+<canvas class="noise-canvas" id="noise-canvas"></canvas>
+<div class="grid-overlay"></div>
+
+<div class="shell">
   <header>
-    <h1>fkobf</h1>
-    <nav>
-      <button id="nav-encrypt" class="active" onclick="switchTab('encrypt')">Encrypt</button>
-      <button id="nav-decrypt" onclick="switchTab('decrypt')">Decrypt</button>
-      <button id="nav-obfuscate" onclick="switchTab('obfuscate')">Obfuscate</button>
-    </nav>
+    <div class="brand">
+      <div class="brand-mark">
+        <div class="brand-dot"></div>
+        <h1>fkobf</h1>
+      </div>
+      <div class="tagline">local encryption &amp; obfuscation, nothing leaves this device</div>
+    </div>
+    <div class="status-pill" id="engine-status">engine ready</div>
   </header>
 
+  <nav>
+    <button id="nav-encrypt" class="active" onclick="switchTab('encrypt')">Encrypt</button>
+    <button id="nav-decrypt" onclick="switchTab('decrypt')">Decrypt</button>
+    <button id="nav-obfuscate" onclick="switchTab('obfuscate')">Obfuscate</button>
+  </nav>
+
   <section id="section-encrypt" class="active">
+    <div class="mode-intro">
+      <h2>Encrypt</h2>
+      <p>AES-256-GCM. Files, folders, and zips stay encrypted until unlocked with a key or password you control.</p>
+    </div>
+
     <div class="dropzone" id="dropzone-encrypt">
-      <p>Drop files, a folder, or a zip here</p>
-      <p class="hint">or use the buttons below</p>
+      <div class="dropzone-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M4 21h16"/></svg>
+      </div>
+      <p>Drop files, a folder, or a zip</p>
+      <p class="hint">or select manually</p>
       <div class="picker-row">
-        <button onclick="document.getElementById('file-input-encrypt').click()">Choose files</button>
-        <button onclick="document.getElementById('folder-input-encrypt').click()">Choose folder</button>
+        <button onclick="document.getElementById('file-input-encrypt').click()">choose files</button>
+        <button onclick="document.getElementById('folder-input-encrypt').click()">choose folder</button>
       </div>
     </div>
     <input type="file" id="file-input-encrypt" multiple>
@@ -337,18 +724,28 @@ input[type="file"] {
     <div class="options">
       <h3>Unlock method</h3>
       <div class="option-row">
-        <input type="checkbox" id="opt-key" checked>
+        <div class="checkbox-wrap">
+          <input type="checkbox" id="opt-key" checked>
+          <div class="checkbox-visual"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        </div>
         <label for="opt-key">Auto-generated key</label>
       </div>
       <div class="option-row">
-        <input type="checkbox" id="opt-password">
+        <div class="checkbox-wrap">
+          <input type="checkbox" id="opt-password">
+          <div class="checkbox-visual"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        </div>
         <label for="opt-password">Password</label>
       </div>
       <div class="option-row" id="password-row" style="display: none;">
-        <input type="password" id="opt-password-value" placeholder="Enter a password">
+        <span class="field-label">password</span>
+        <input type="password" id="opt-password-value" placeholder="set a password">
       </div>
       <div class="option-row" id="hide-names-row" style="display: none;">
-        <input type="checkbox" id="opt-hide-names">
+        <div class="checkbox-wrap">
+          <input type="checkbox" id="opt-hide-names">
+          <div class="checkbox-visual"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+        </div>
         <label for="opt-hide-names">Hide filenames inside the zip</label>
       </div>
     </div>
@@ -358,12 +755,20 @@ input[type="file"] {
   </section>
 
   <section id="section-decrypt">
+    <div class="mode-intro">
+      <h2>Decrypt</h2>
+      <p>Provide the key or password used at encryption time. Wrong credentials fail loudly, never silently.</p>
+    </div>
+
     <div class="dropzone" id="dropzone-decrypt">
-      <p>Drop encrypted files or a folder here</p>
-      <p class="hint">or use the buttons below</p>
+      <div class="dropzone-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M18 13l-6-6-6 6"/><path d="M4 3h16"/></svg>
+      </div>
+      <p>Drop encrypted files or a folder</p>
+      <p class="hint">or select manually</p>
       <div class="picker-row">
-        <button onclick="document.getElementById('file-input-decrypt').click()">Choose files</button>
-        <button onclick="document.getElementById('folder-input-decrypt').click()">Choose folder</button>
+        <button onclick="document.getElementById('file-input-decrypt').click()">choose files</button>
+        <button onclick="document.getElementById('folder-input-decrypt').click()">choose folder</button>
       </div>
     </div>
     <input type="file" id="file-input-decrypt" multiple>
@@ -374,12 +779,12 @@ input[type="file"] {
     <div class="options">
       <h3>Unlock with</h3>
       <div class="option-row">
-        <label for="opt-decrypt-key">Key</label>
+        <span class="field-label">key</span>
         <input type="text" id="opt-decrypt-key" placeholder="64 character key">
       </div>
       <div class="option-row">
-        <label for="opt-decrypt-password">Password</label>
-        <input type="password" id="opt-decrypt-password" placeholder="Password">
+        <span class="field-label">password</span>
+        <input type="password" id="opt-decrypt-password" placeholder="password">
       </div>
     </div>
 
@@ -388,12 +793,20 @@ input[type="file"] {
   </section>
 
   <section id="section-obfuscate">
+    <div class="mode-intro">
+      <h2>Obfuscate</h2>
+      <p>Hardens JavaScript source so it is difficult to read. No key involved, output still runs directly.</p>
+    </div>
+
     <div class="dropzone" id="dropzone-obfuscate">
-      <p>Drop JavaScript files or a folder here</p>
-      <p class="hint">output still runs directly, no key needed</p>
+      <div class="dropzone-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+      </div>
+      <p>Drop JavaScript files or a folder</p>
+      <p class="hint">output stays fully runnable</p>
       <div class="picker-row">
-        <button onclick="document.getElementById('file-input-obfuscate').click()">Choose files</button>
-        <button onclick="document.getElementById('folder-input-obfuscate').click()">Choose folder</button>
+        <button onclick="document.getElementById('file-input-obfuscate').click()">choose files</button>
+        <button onclick="document.getElementById('folder-input-obfuscate').click()">choose folder</button>
       </div>
     </div>
     <input type="file" id="file-input-obfuscate" multiple accept=".js">
@@ -408,22 +821,29 @@ input[type="file"] {
         <button class="preset-btn" data-preset="medium" onclick="selectPreset('medium')">Medium</button>
         <button class="preset-btn" data-preset="heavy" onclick="selectPreset('heavy')">Heavy</button>
       </div>
+      <div class="preset-detail" id="preset-detail">rename identifiers, compact output</div>
     </div>
 
     <button class="action-button" id="obfuscate-button" onclick="runObfuscate()">Obfuscate</button>
     <div class="status" id="status-obfuscate"></div>
   </section>
+
+  <footer>
+    <span>fkobf</span>
+    <span id="clock-readout">aes-256-gcm / argon2id</span>
+  </footer>
 </div>
 
 <div class="modal-overlay" id="key-modal">
   <div class="modal">
-    <h2>Save this key</h2>
-    <p>This key is the only way to recover your data if you did not also set a password. It will not be shown again.</p>
+    <div class="modal-badge">save this key</div>
+    <h2>This will not be shown again</h2>
+    <p>This key is the only way to recover your data if you did not also set a password. There is no reset and no recovery mechanism.</p>
     <div class="key-box" id="key-box-content"></div>
     <div class="warning-text">A file containing this key will also download automatically.</div>
     <div class="modal-buttons">
-      <button class="copy-button" onclick="copyKey()">Copy key</button>
-      <button class="confirm-button" id="confirm-key-button" onclick="closeKeyModal()" disabled>I have saved it, continue</button>
+      <button class="copy-button" onclick="copyKey()">copy key</button>
+      <button class="confirm-button" id="confirm-key-button" onclick="closeKeyModal()" disabled>saved it, continue</button>
     </div>
   </div>
 </div>
@@ -432,6 +852,12 @@ input[type="file"] {
 let selectedFiles = { encrypt: [], decrypt: [], obfuscate: [] }
 let selectedPreset = 'light'
 let pendingKeyText = ''
+
+const presetDetails = {
+  light: 'rename identifiers, compact output',
+  medium: 'plus string encryption, dead code injection',
+  heavy: 'plus control flow flattening, self defending, anti debug'
+}
 
 function switchTab(tab) {
   document.querySelectorAll('nav button').forEach(function (btn) { btn.classList.remove('active') })
@@ -445,6 +871,7 @@ function selectPreset(preset) {
   document.querySelectorAll('.preset-btn').forEach(function (btn) {
     btn.classList.toggle('active', btn.dataset.preset === preset)
   })
+  document.getElementById('preset-detail').textContent = presetDetails[preset]
 }
 
 function renderFileList(mode) {
@@ -454,6 +881,7 @@ function renderFileList(mode) {
   list.innerHTML = ''
   files.forEach(function (entry) {
     const div = document.createElement('div')
+    div.className = 'file-list-item'
     div.textContent = entry.relativePath
     list.appendChild(div)
   })
@@ -565,7 +993,7 @@ function closeKeyModal() {
 async function runEncrypt() {
   const files = selectedFiles.encrypt
   if (files.length === 0) {
-    showStatus('encrypt', 'Choose at least one file or folder first', true)
+    showStatus('encrypt', 'choose at least one file or folder first', true)
     return
   }
 
@@ -573,13 +1001,13 @@ async function runEncrypt() {
   const wantsPassword = document.getElementById('opt-password').checked
 
   if (!wantsKey && !wantsPassword) {
-    showStatus('encrypt', 'Select at least one unlock method', true)
+    showStatus('encrypt', 'select at least one unlock method', true)
     return
   }
 
   const password = document.getElementById('opt-password-value').value
   if (wantsPassword && !password) {
-    showStatus('encrypt', 'Enter a password or uncheck password mode', true)
+    showStatus('encrypt', 'enter a password or uncheck password mode', true)
     return
   }
 
@@ -598,14 +1026,14 @@ async function runEncrypt() {
   })
 
   document.getElementById('encrypt-button').disabled = true
-  showStatus('encrypt', 'Encrypting', false)
+  showStatus('encrypt', 'encrypting', false)
 
   try {
     const response = await fetch('/api/encrypt', { method: 'POST', body: formData })
     const data = await response.json()
 
     if (!response.ok) {
-      showStatus('encrypt', data.error || 'Encryption failed', true)
+      showStatus('encrypt', data.error || 'encryption failed', true)
       return
     }
 
@@ -613,7 +1041,7 @@ async function runEncrypt() {
       downloadBase64File(f.name, f.data)
     })
 
-    showStatus('encrypt', 'Encrypted ' + data.files.length + ' file(s)', false)
+    showStatus('encrypt', 'encrypted ' + data.files.length + ' file(s)', false)
 
     if (data.key) {
       showKeyModal(data.key, files[0].relativePath.split('/')[0] || 'fkobf')
@@ -628,7 +1056,7 @@ async function runEncrypt() {
 async function runDecrypt() {
   const files = selectedFiles.decrypt
   if (files.length === 0) {
-    showStatus('decrypt', 'Choose at least one file or folder first', true)
+    showStatus('decrypt', 'choose at least one file or folder first', true)
     return
   }
 
@@ -636,7 +1064,7 @@ async function runDecrypt() {
   const password = document.getElementById('opt-decrypt-password').value
 
   if (!key && !password) {
-    showStatus('decrypt', 'Enter the key or the password', true)
+    showStatus('decrypt', 'enter the key or the password', true)
     return
   }
 
@@ -651,14 +1079,14 @@ async function runDecrypt() {
   })
 
   document.getElementById('decrypt-button').disabled = true
-  showStatus('decrypt', 'Decrypting', false)
+  showStatus('decrypt', 'decrypting', false)
 
   try {
     const response = await fetch('/api/decrypt', { method: 'POST', body: formData })
     const data = await response.json()
 
     if (!response.ok) {
-      showStatus('decrypt', data.error || 'Decryption failed', true)
+      showStatus('decrypt', data.error || 'decryption failed', true)
       return
     }
 
@@ -666,7 +1094,7 @@ async function runDecrypt() {
       downloadBase64File(f.name, f.data)
     })
 
-    showStatus('decrypt', 'Decrypted ' + data.files.length + ' file(s)', false)
+    showStatus('decrypt', 'decrypted ' + data.files.length + ' file(s)', false)
   } catch (error) {
     showStatus('decrypt', error.message, true)
   } finally {
@@ -677,7 +1105,7 @@ async function runDecrypt() {
 async function runObfuscate() {
   const files = selectedFiles.obfuscate
   if (files.length === 0) {
-    showStatus('obfuscate', 'Choose at least one JavaScript file first', true)
+    showStatus('obfuscate', 'choose at least one JavaScript file first', true)
     return
   }
 
@@ -691,14 +1119,14 @@ async function runObfuscate() {
   })
 
   document.getElementById('obfuscate-button').disabled = true
-  showStatus('obfuscate', 'Obfuscating', false)
+  showStatus('obfuscate', 'obfuscating', false)
 
   try {
     const response = await fetch('/api/obfuscate', { method: 'POST', body: formData })
     const data = await response.json()
 
     if (!response.ok) {
-      showStatus('obfuscate', data.error || 'Obfuscation failed', true)
+      showStatus('obfuscate', data.error || 'obfuscation failed', true)
       return
     }
 
@@ -706,13 +1134,54 @@ async function runObfuscate() {
       downloadBase64File(f.name, f.data)
     })
 
-    showStatus('obfuscate', 'Obfuscated ' + data.files.length + ' file(s)', false)
+    showStatus('obfuscate', 'obfuscated ' + data.files.length + ' file(s)', false)
   } catch (error) {
     showStatus('obfuscate', error.message, true)
   } finally {
     document.getElementById('obfuscate-button').disabled = false
   }
 }
+
+function initNoiseCanvas() {
+  const canvas = document.getElementById('noise-canvas')
+  const ctx = canvas.getContext('2d')
+  const scale = 0.15
+
+  function resize() {
+    canvas.width = Math.ceil(window.innerWidth * scale)
+    canvas.height = Math.ceil(window.innerHeight * scale)
+  }
+  resize()
+  window.addEventListener('resize', resize)
+
+  function draw() {
+    const w = canvas.width
+    const h = canvas.height
+    const imageData = ctx.createImageData(w, h)
+    const buffer = imageData.data
+    for (let i = 0; i < buffer.length; i += 4) {
+      const shade = Math.random() * 255
+      buffer[i] = shade
+      buffer[i + 1] = shade
+      buffer[i + 2] = shade
+      buffer[i + 3] = 255
+    }
+    ctx.putImageData(imageData, 0, 0)
+  }
+
+  draw()
+  setInterval(draw, 180)
+}
+
+function initClockReadout() {
+  const el = document.getElementById('clock-readout')
+  const base = 'aes-256-gcm / argon2id'
+  el.textContent = base
+}
+
+initNoiseCanvas()
+initClockReadout()
+selectPreset('light')
 </script>
 </body>
 </html>
