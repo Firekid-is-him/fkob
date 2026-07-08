@@ -1,6 +1,6 @@
 {
   "name": "fkobf",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Self-hosted local file encryption and code obfuscation tool",
   "main": "src/index.js",
   "bin": {
