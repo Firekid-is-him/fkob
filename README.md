@@ -105,6 +105,10 @@ Wrong key, wrong password, or a tampered file all fail loudly during decryption.
 
 The source code is public. This is deliberate. A cryptographic tool being secure only because its implementation is secret is not real security, real security comes from the key being the only secret, ever.
 
+## Changelog
+
+See CHANGELOG.md for release history.
+
 ## License
 
 GPL-3.0. See LICENSE.
