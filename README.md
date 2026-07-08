@@ -2,7 +2,11 @@
 
 Self-hosted local file encryption and code obfuscation tool. Clone it, run it on your own device, nothing leaves your machine.
 
-![Tests](https://github.com/Firekid-is-him/fkobf/actions/workflows/test.yml/badge.svg)
+![Tests](https://github.com/Firekid-is-him/fkob/actions/workflows/test.yml/badge.svg)
+![npm version](https://img.shields.io/npm/v/fkobf)
+![npm downloads](https://img.shields.io/npm/dt/fkobf)
+![GitHub stars](https://img.shields.io/github/stars/Firekid-is-him/fkob)
+![last commit](https://img.shields.io/github/last-commit/Firekid-is-him/fkob)
 
 ## What it does
 
