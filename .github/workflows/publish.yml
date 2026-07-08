@@ -1,0 +1,64 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish, for example 1.0.1. Leave blank to use current package.json version'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Check if version bump is needed
+        if: github.event_name == 'workflow_dispatch' && inputs.version != ''
+        id: version_check
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          INPUT_VERSION="${{ inputs.version }}"
+          if [ "$CURRENT_VERSION" == "$INPUT_VERSION" ]; then
+            echo "match=true" >> "$GITHUB_OUTPUT"
+            echo "package.json already at $INPUT_VERSION, skipping bump"
+          else
+            echo "match=false" >> "$GITHUB_OUTPUT"
+            echo "package.json is $CURRENT_VERSION, bumping to $INPUT_VERSION"
+          fi
+
+      - name: Bump version, commit, and push
+        if: github.event_name == 'workflow_dispatch' && inputs.version != '' && steps.version_check.outputs.match == 'false'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          npm version ${{ inputs.version }} --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ inputs.version }}"
+          git push
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
